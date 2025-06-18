@@ -1,10 +1,11 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { User, LogOut } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useLogout } from '@/services/authService';
+import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/ui/Logo';
+import SubscriptionStatus from './SubscriptionStatus';
 
 interface DashboardHeaderProps {
   userEmail?: string;
@@ -12,6 +13,7 @@ interface DashboardHeaderProps {
 
 const DashboardHeader = ({ userEmail }: DashboardHeaderProps) => {
   const { logout } = useLogout();
+  const navigate = useNavigate();
 
   return (
     <header className="bg-white px-6 py-4">
@@ -22,6 +24,16 @@ const DashboardHeader = ({ userEmail }: DashboardHeaderProps) => {
         </div>
         
         <div className="flex items-center space-x-4">
+          <SubscriptionStatus />
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/pricing')}
+          >
+            Pricing
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="p-0">
