@@ -210,19 +210,19 @@ const StudioSidebar = ({
   };
 
   if (isEditingMode) {
-    return <div className="w-full bg-gray-50 border-l border-gray-200 flex flex-col h-full overflow-hidden">
+    return <div className="w-full bg-muted border-l border-border flex flex-col h-full overflow-hidden">
         <NoteEditor note={editingNote || undefined} onSave={handleSaveNote} onDelete={editingNote ? handleDeleteNote : undefined} onCancel={handleCancel} isLoading={isCreating || isUpdating || isDeleting} onCitationClick={onCitationClick} />
       </div>;
   }
 
-  return <div className="w-full bg-gray-50 border-l border-gray-200 flex flex-col h-full overflow-hidden">
-      <div className="p-4 border-b border-gray-200 flex-shrink-0">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Studio</h2>
+  return <div className="w-full bg-muted border-l border-border flex flex-col h-full overflow-hidden">
+      <div className="p-4 border-b border-border flex-shrink-0">
+        <h2 className="text-lg font-medium text-foreground mb-4">Studio</h2>
         
         {/* Audio Overview */}
-        <Card className="p-4 mb-4 border border-gray-200">
+        <Card className="p-4 mb-4 border border-border">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900">Audio Overview</h3>
+            <h3 className="font-medium text-foreground">Audio Overview</h3>
           </div>
 
           {hasValidAudio && !audioError && currentStatus !== 'generating' && !isAutoRefreshing ? <AudioPlayer 
@@ -234,17 +234,17 @@ const StudioSidebar = ({
               onRetry={handleAudioRetry} 
               onDeleted={handleAudioDeleted}
               onUrlRefresh={handleUrlRefresh}
-            /> : <Card className="p-3 border border-gray-200">
+            /> : <Card className="p-3 border border-border">
               {/* Hide this div when generating or auto-refreshing */}
               {currentStatus !== 'generating' && !isGenerating && !isAutoRefreshing && <div className="flex items-center space-x-3 mb-3">
                   <div className="w-8 h-8 rounded flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#111827">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                       <path d="M280-120v-123q-104-14-172-93T40-520h80q0 83 58.5 141.5T320-320h10q5 0 10-1 13 20 28 37.5t32 32.5q-10 3-19.5 4.5T360-243v123h-80Zm20-282q-43-8-71.5-40.5T200-520v-240q0-50 35-85t85-35q50 0 85 35t35 85v160H280v80q0 31 5 60.5t15 57.5Zm340 2q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T640-320q83 0 141.5-58.5T840-520h80q0 105-68 184t-172 93v123h-80Zm40-360q17 0 28.5-11.5T680-520v-240q0-17-11.5-28.5T640-800q-17 0-28.5 11.5T600-760v240q0 17 11.5 28.5T640-480Zm0-160Z" />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">Deep Dive conversation</h4>
-                    <p className="text-sm text-gray-600">Two hosts</p>
+                    <h4 className="font-medium text-foreground">Deep Dive conversation</h4>
+                    <p className="text-sm text-muted-foreground">Two hosts</p>
                   </div>
                 </div>}
               
@@ -252,8 +252,8 @@ const StudioSidebar = ({
               {getStatusDisplay() && <div className="flex items-center space-x-2 mb-3 p-2 rounded-md bg-transparent">
                   {getStatusDisplay()!.icon}
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">{getStatusDisplay()!.text}</p>
-                    <p className="text-xs text-slate-900">{getStatusDisplay()!.description}</p>
+                    <p className="text-sm font-medium text-foreground">{getStatusDisplay()!.text}</p>
+                    <p className="text-xs text-muted-foreground">{getStatusDisplay()!.description}</p>
                   </div>
                 </div>}
               
@@ -270,7 +270,7 @@ const StudioSidebar = ({
                 </div>}
               
               <div className="flex space-x-2">
-                <Button size="sm" onClick={handleGenerateAudio} disabled={isGenerating || currentStatus === 'generating' || !hasProcessedSource || isAutoRefreshing} className="flex-1 text-white bg-slate-900 hover:bg-slate-800">
+                <Button size="sm" onClick={handleGenerateAudio} disabled={isGenerating || currentStatus === 'generating' || !hasProcessedSource || isAutoRefreshing} className="flex-1 text-primary-foreground bg-slate-900 hover:bg-slate-800">
                   {isGenerating || currentStatus === 'generating' ? <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Generating...
@@ -283,7 +283,7 @@ const StudioSidebar = ({
         {/* Notes Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900">Notes</h3>
+            <h3 className="font-medium text-foreground">Notes</h3>
             
           </div>
           
@@ -298,22 +298,22 @@ const StudioSidebar = ({
       <ScrollArea className="flex-1 h-full">
         <div className="p-4">
           {isLoading ? <div className="text-center py-8">
-              <p className="text-sm text-gray-600">Loading notes...</p>
+              <p className="text-sm text-muted-foreground">Loading notes...</p>
             </div> : notes && notes.length > 0 ? <div className="space-y-3">
-              {notes.map(note => <Card key={note.id} className="p-3 border border-gray-200 hover:bg-gray-50 cursor-pointer" onClick={() => handleEditNote(note)}>
+              {notes.map(note => <Card key={note.id} className="p-3 border border-border hover:bg-background/50 cursor-pointer" onClick={() => handleEditNote(note)}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-1">
-                        {note.source_type === 'ai_response' ? <Bot className="h-3 w-3 text-blue-600" /> : <User className="h-3 w-3 text-gray-600" />}
-                        <span className="text-xs text-gray-500 uppercase">
+                        {note.source_type === 'ai_response' ? <Bot className="h-3 w-3 text-blue-600" /> : <User className="h-3 w-3 text-muted-foreground" />}
+                        <span className="text-xs text-muted-foreground uppercase">
                           {note.source_type === 'ai_response' ? 'AI Response' : 'Note'}
                         </span>
                       </div>
-                      <h4 className="font-medium text-gray-900 truncate">{note.title}</h4>
-                      <p className="text-sm text-gray-600 line-clamp-2 mt-1">
+                      <h4 className="font-medium text-foreground truncate">{note.title}</h4>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                         {getPreviewText(note)}
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-muted-foreground mt-2">
                         {new Date(note.updated_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -323,11 +323,11 @@ const StudioSidebar = ({
                   </div>
                 </Card>)}
             </div> : <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                <span className="text-gray-400 text-2xl">📄</span>
+              <div className="w-16 h-16 bg-muted-foreground/20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                <span className="text-muted-foreground text-2xl">📄</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Saved notes will appear here</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-medium text-foreground mb-2">Saved notes will appear here</h3>
+              <p className="text-sm text-muted-foreground">
                 Save a chat message to create a new note, or click Add note above.
               </p>
             </div>}

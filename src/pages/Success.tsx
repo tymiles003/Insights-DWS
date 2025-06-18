@@ -17,7 +17,7 @@ const Success = () => {
   }, [toast]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -31,8 +31,8 @@ const Success = () => {
         
         <CardContent className="space-y-4">
           <div className="text-center space-y-2">
-            <p className="text-gray-600">
-              You can now access all premium features of InsightsLM.
+            <p className="text-muted-foreground">
+              You can now access all premium features of InsightsDWS.
             </p>
           </div>
           
