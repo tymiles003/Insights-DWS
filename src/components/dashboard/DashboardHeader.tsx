@@ -25,7 +25,7 @@ const DashboardHeader = ({ userEmail }: DashboardHeaderProps) => {
           >
             <Logo />
           </button>
-          <h1 className="text-xl font-medium text-foreground">InsightsLM</h1>
+          <h1 className="text-xl font-medium text-foreground">InsightsDWS</h1>
         </div>
         
         <div className="flex items-center space-x-4">
