@@ -1,10 +1,11 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import NotebookCard from './NotebookCard';
-import { Check, Grid3X3, List, ChevronDown } from 'lucide-react';
+import { Check, Grid3X3, List, ChevronDown, Plus } from 'lucide-react';
 import { useNotebooks } from '@/hooks/useNotebooks';
 import { useNavigate } from 'react-router-dom';
+import { useOrganizations, Organization } from '@/hooks/useOrganizations';
+import CreateNotebookDialog from '@/components/notebook/CreateNotebookDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +16,16 @@ import {
 const NotebookGrid = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('Most recent');
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
+  
   const {
     notebooks,
     isLoading,
-    createNotebook,
-    isCreating
-  } = useNotebooks();
+  } = useNotebooks(selectedOrg?.id);
+  
+  const { organizations } = useOrganizations();
+  
   const navigate = useNavigate();
 
   const sortedNotebooks = useMemo(() => {
@@ -37,21 +42,6 @@ const NotebookGrid = () => {
     return sorted;
   }, [notebooks, sortBy]);
 
-  const handleCreateNotebook = () => {
-    createNotebook({
-      title: 'Untitled notebook',
-      description: ''
-    }, {
-      onSuccess: data => {
-        console.log('Navigating to notebook:', data.id);
-        navigate(`/notebook/${data.id}`);
-      },
-      onError: error => {
-        console.error('Failed to create notebook:', error);
-      }
-    });
-  };
-
   const handleNotebookClick = (notebookId: string, e: React.MouseEvent) => {
     // Check if the click is coming from a delete action or other interactive element
     const target = e.target as HTMLElement;
@@ -64,23 +54,62 @@ const NotebookGrid = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center py-16">
-        <p className="text-gray-600">Loading notebooks...</p>
-      </div>;
+    return (
+      <div className="text-center py-16">
+        <p className="text-muted-foreground">Loading notebooks...</p>
+      </div>
+    );
   }
 
-  return <div>
-      <div className="flex items-center justify-between mb-8">
-        <Button className="bg-black hover:bg-gray-800 text-white rounded-full px-6" onClick={handleCreateNotebook} disabled={isCreating}>
-          {isCreating ? 'Creating...' : '+ Create new'}
-        </Button>
+  return (
+    <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center space-x-4">
+          <Button 
+            className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6" 
+            onClick={() => setShowCreateDialog(true)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create new
+          </Button>
+          
+          {organizations.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  {selectedOrg ? selectedOrg.name : 'Personal Notebooks'}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem 
+                  onClick={() => setSelectedOrg(null)}
+                  className={!selectedOrg ? 'bg-accent text-accent-foreground' : ''}
+                >
+                  Personal Notebooks
+                  {!selectedOrg && <Check className="ml-2 h-4 w-4" />}
+                </DropdownMenuItem>
+                {organizations.map(org => (
+                  <DropdownMenuItem 
+                    key={org.id} 
+                    onClick={() => setSelectedOrg(org)}
+                    className={selectedOrg?.id === org.id ? 'bg-accent text-accent-foreground' : ''}
+                  >
+                    {org.name}
+                    {selectedOrg?.id === org.id && <Check className="ml-2 h-4 w-4" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
         
         <div className="flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center space-x-2 bg-white rounded-lg border px-3 py-2 cursor-pointer hover:bg-gray-50 transition-colors">
-                <span className="text-sm text-gray-600">{sortBy}</span>
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center space-x-2 bg-card rounded-lg border px-3 py-2 cursor-pointer hover:bg-muted transition-colors">
+                <span className="text-sm text-foreground">{sortBy}</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -98,22 +127,30 @@ const NotebookGrid = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {sortedNotebooks.map(notebook => <div key={notebook.id} onClick={e => handleNotebookClick(notebook.id, e)}>
+        {sortedNotebooks.map(notebook => (
+          <div key={notebook.id} onClick={e => handleNotebookClick(notebook.id, e)}>
             <NotebookCard notebook={{
-          id: notebook.id,
-          title: notebook.title,
-          date: new Date(notebook.updated_at).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          }),
-          sources: notebook.sources?.[0]?.count || 0,
-          icon: notebook.icon || '📝',
-          color: notebook.color || 'bg-gray-100'
-        }} />
-          </div>)}
+              id: notebook.id,
+              title: notebook.title,
+              date: new Date(notebook.updated_at).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              }),
+              sources: notebook.sources?.[0]?.count || 0,
+              icon: notebook.icon || '📝',
+              color: notebook.color || 'gray'
+            }} />
+          </div>
+        ))}
       </div>
-    </div>;
+      
+      <CreateNotebookDialog 
+        open={showCreateDialog} 
+        onOpenChange={setShowCreateDialog} 
+      />
+    </div>
+  );
 };
 
 export default NotebookGrid;

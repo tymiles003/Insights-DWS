@@ -1,32 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload, FileText, Globe, Video, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useNotebooks } from '@/hooks/useNotebooks';
+import CreateNotebookDialog from '@/components/notebook/CreateNotebookDialog';
 
 const EmptyDashboard = () => {
   const navigate = useNavigate();
-  const {
-    createNotebook,
-    isCreating
-  } = useNotebooks();
-
-  const handleCreateNotebook = () => {
-    console.log('Create notebook button clicked');
-    console.log('isCreating:', isCreating);
-    createNotebook({
-      title: 'Untitled notebook',
-      description: ''
-    }, {
-      onSuccess: data => {
-        console.log('Navigating to notebook:', data.id);
-        navigate(`/notebook/${data.id}`);
-      },
-      onError: error => {
-        console.error('Failed to create notebook:', error);
-      }
-    });
-  };
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   return (
     <div className="text-center py-16">
@@ -61,10 +41,15 @@ const EmptyDashboard = () => {
         </div>
       </div>
 
-      <Button onClick={handleCreateNotebook} size="lg" className="bg-primary hover:bg-primary/90" disabled={isCreating}>
+      <Button onClick={() => setShowCreateDialog(true)} size="lg" className="bg-primary hover:bg-primary/90">
         <Upload className="h-5 w-5 mr-2" />
-        {isCreating ? 'Creating...' : 'Create notebook'}
+        Create notebook
       </Button>
+      
+      <CreateNotebookDialog 
+        open={showCreateDialog} 
+        onOpenChange={setShowCreateDialog} 
+      />
     </div>
   );
 };

@@ -1,10 +1,15 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-export const useNotebooks = () => {
+export interface CreateNotebookParams {
+  title: string;
+  description?: string;
+  organizationId?: string;
+}
+
+export const useNotebooks = (organizationId?: string) => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const queryClient = useQueryClient();
 
@@ -14,20 +19,28 @@ export const useNotebooks = () => {
     error,
     isError,
   } = useQuery({
-    queryKey: ['notebooks', user?.id],
+    queryKey: ['notebooks', user?.id, organizationId],
     queryFn: async () => {
       if (!user) {
         console.log('No user found, returning empty notebooks array');
         return [];
       }
       
-      console.log('Fetching notebooks for user:', user.id);
+      console.log('Fetching notebooks for user:', user.id, 'organization:', organizationId);
       
-      // First get the notebooks
-      const { data: notebooksData, error: notebooksError } = await supabase
+      let query = supabase
         .from('notebooks')
-        .select('*')
-        .eq('user_id', user.id)
+        .select('*');
+      
+      // If organizationId is provided, filter by organization
+      if (organizationId) {
+        query = query.eq('organization_id', organizationId);
+      } else {
+        // Otherwise, show only personal notebooks (no organization)
+        query = query.is('organization_id', null).eq('user_id', user.id);
+      }
+      
+      const { data: notebooksData, error: notebooksError } = await query
         .order('updated_at', { ascending: false });
 
       if (notebooksError) {
@@ -71,34 +84,55 @@ export const useNotebooks = () => {
 
     console.log('Setting up real-time subscription for notebooks');
 
-    const channel = supabase
-      .channel('notebooks-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notebooks',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('Real-time notebook update received:', payload);
-          
-          // Invalidate and refetch notebooks when any change occurs
-          queryClient.invalidateQueries({ queryKey: ['notebooks', user.id] });
-        }
-      )
-      .subscribe();
+    let channel;
+    
+    if (organizationId) {
+      // Subscribe to organization notebooks
+      channel = supabase
+        .channel('org-notebooks-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notebooks',
+            filter: `organization_id=eq.${organizationId}`
+          },
+          (payload) => {
+            console.log('Real-time notebook update received:', payload);
+            queryClient.invalidateQueries({ queryKey: ['notebooks', user.id, organizationId] });
+          }
+        )
+        .subscribe();
+    } else {
+      // Subscribe to personal notebooks
+      channel = supabase
+        .channel('personal-notebooks-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notebooks',
+            filter: `user_id=eq.${user.id}`
+          },
+          (payload) => {
+            console.log('Real-time notebook update received:', payload);
+            queryClient.invalidateQueries({ queryKey: ['notebooks', user.id, null] });
+          }
+        )
+        .subscribe();
+    }
 
     return () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [user?.id, isAuthenticated, queryClient]);
+  }, [user?.id, isAuthenticated, queryClient, organizationId]);
 
   const createNotebook = useMutation({
-    mutationFn: async (notebookData: { title: string; description?: string }) => {
-      console.log('Creating notebook with data:', notebookData);
+    mutationFn: async ({ title, description, organizationId }: CreateNotebookParams) => {
+      console.log('Creating notebook with data:', { title, description, organizationId });
       console.log('Current user:', user?.id);
       
       if (!user) {
@@ -106,14 +140,21 @@ export const useNotebooks = () => {
         throw new Error('User not authenticated');
       }
 
+      const notebookData: any = {
+        title,
+        description,
+        user_id: user.id,
+        generation_status: 'pending',
+      };
+      
+      // Add organization_id if provided
+      if (organizationId) {
+        notebookData.organization_id = organizationId;
+      }
+
       const { data, error } = await supabase
         .from('notebooks')
-        .insert({
-          title: notebookData.title,
-          description: notebookData.description,
-          user_id: user.id,
-          generation_status: 'pending',
-        })
+        .insert(notebookData)
         .select()
         .single();
 
@@ -127,7 +168,9 @@ export const useNotebooks = () => {
     },
     onSuccess: (data) => {
       console.log('Mutation success, invalidating queries');
-      queryClient.invalidateQueries({ queryKey: ['notebooks', user?.id] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['notebooks', user?.id, data.organization_id || null] 
+      });
     },
     onError: (error) => {
       console.error('Mutation error:', error);

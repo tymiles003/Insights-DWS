@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
 import Success from "./pages/Success";
 import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,14 @@ const AppContent = () => {
         element={
           <ProtectedRoute fallback={<Auth />}>
             <Profile />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute fallback={<Auth />}>
+            <Admin />
           </ProtectedRoute>
         } 
       />
