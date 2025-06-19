@@ -313,7 +313,7 @@ const AudioPlayer = ({
       
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <h4 className="font-medium text-gray-900">{title}</h4>
+          <h4 className="font-medium text-foreground">{title}</h4>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -336,7 +336,7 @@ const AudioPlayer = ({
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={deleteAudio}
-              className="text-red-600 focus:text-red-600"
+              className="text-destructive focus:text-destructive"
               disabled={isDeleting}
             >
               <Trash2 className="h-4 w-4 mr-2" />
@@ -348,26 +348,26 @@ const AudioPlayer = ({
 
       {/* Auto-refresh indicator */}
       {autoRetryInProgress && (
-        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-md border border-blue-200">
+        <div className="flex items-center justify-between p-3 bg-primary/10 rounded-md border border-primary/20">
           <div className="flex items-center space-x-2">
-            <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
-            <span className="text-sm text-blue-600">Refreshing audio access...</span>
+            <Loader2 className="h-4 w-4 text-primary animate-spin" />
+            <span className="text-sm text-primary">Refreshing audio access...</span>
           </div>
         </div>
       )}
 
       {/* Error State */}
       {audioError && !autoRetryInProgress && (
-        <div className="flex items-center justify-between p-3 bg-red-50 rounded-md border border-red-200">
+        <div className="flex items-center justify-between p-3 bg-destructive/10 rounded-md border border-destructive/20">
           <div className="flex items-center space-x-2">
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-            <span className="text-sm text-red-600">{audioError}</span>
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <span className="text-sm text-destructive">{audioError}</span>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={onRetry || retryLoad}
-            className="text-red-600 border-red-300 hover:bg-red-50"
+            className="text-destructive border-destructive/30 hover:bg-destructive/10"
           >
             <RefreshCw className="h-4 w-4 mr-1" />
             Retry
@@ -385,7 +385,7 @@ const AudioPlayer = ({
           className="w-full"
           disabled={loading || !!audioError}
         />
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
@@ -411,7 +411,7 @@ const AudioPlayer = ({
             className="w-12"
           >
             {loading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground" />
             ) : isPlaying ? (
               <Pause className="h-4 w-4" />
             ) : (
@@ -422,7 +422,7 @@ const AudioPlayer = ({
 
         {/* Volume Control */}
         <div className="flex items-center space-x-2 w-24">
-          <Volume2 className="h-4 w-4 text-gray-500" />
+          <Volume2 className="h-4 w-4 text-muted-foreground" />
           <Slider
             value={[volume]}
             max={1}

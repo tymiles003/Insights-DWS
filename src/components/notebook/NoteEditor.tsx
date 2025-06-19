@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,9 +99,9 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
     return (
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 flex-shrink-0">
+        <div className="p-4 border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-gray-900">
+            <h3 className="font-medium text-foreground">
               {isAIResponse ? 'AI Response' : 'Note'}
             </h3>
             <div className="flex items-center space-x-2">
@@ -117,7 +116,7 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
             </div>
           </div>
           
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
         </div>
 
         {/* Content */}
@@ -125,16 +124,16 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
           {isAIResponse && typeof parsedContent === 'object' ? (
             <MarkdownRenderer 
               content={parsedContent}
-              className="prose max-w-none"
+              className="prose max-w-none dark:prose-invert"
               onCitationClick={onCitationClick}
             />
           ) : (
-            <div className="whitespace-pre-wrap text-gray-700">{typeof parsedContent === 'string' ? parsedContent : content}</div>
+            <div className="whitespace-pre-wrap text-foreground">{typeof parsedContent === 'string' ? parsedContent : content}</div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200 flex-shrink-0">
+        <div className="p-4 border-t border-border flex-shrink-0">
           <div className="flex justify-between">
             <div>
               {note && onDelete && (
@@ -143,14 +142,14 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
                   size="sm" 
                   onClick={onDelete}
                   disabled={isLoading}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </Button>
               )}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               {note?.created_at && new Date(note.created_at).toLocaleDateString()}
             </div>
           </div>
@@ -163,9 +162,9 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex-shrink-0">
+      <div className="p-4 border-b border-border flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-medium text-gray-900">
+          <h3 className="font-medium text-foreground">
             {note ? 'Edit Note' : 'New Note'}
           </h3>
           <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
@@ -205,7 +204,7 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 flex-shrink-0">
+      <div className="p-4 border-t border-border flex-shrink-0">
         <div className="flex justify-between">
           <div>
             {note && onDelete && !isAIResponse && (
@@ -214,7 +213,7 @@ const NoteEditor = ({ note, onSave, onDelete, onCancel, isLoading, onCitationCli
                 size="sm" 
                 onClick={onDelete}
                 disabled={isLoading}
-                className="text-red-600 hover:text-red-700"
+                className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete

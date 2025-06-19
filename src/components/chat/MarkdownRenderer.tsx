@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MessageSegment, Citation } from '@/types/message';
 import CitationButton from './CitationButton';
