@@ -5,28 +5,6 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Validate environment variables
-if (!SUPABASE_URL) {
-  throw new Error(
-    'Missing VITE_SUPABASE_URL environment variable. Please check your .env file and ensure it contains a valid Supabase URL.'
-  );
-}
-
-if (!SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error(
-    'Missing VITE_SUPABASE_ANON_KEY environment variable. Please check your .env file and ensure it contains a valid Supabase anon key.'
-  );
-}
-
-// Validate URL format
-try {
-  new URL(SUPABASE_URL);
-} catch (error) {
-  throw new Error(
-    `Invalid VITE_SUPABASE_URL format: "${SUPABASE_URL}". Please ensure it's a valid URL (e.g., https://your-project.supabase.co)`
-  );
-}
-
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
