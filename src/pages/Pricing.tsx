@@ -6,6 +6,9 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { products } from '@/stripe-config';
 import PricingCard from '@/components/pricing/PricingCard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -30,18 +33,18 @@ const Pricing = () => {
   const currentPlan = getCurrentPlan();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <DashboardHeader userEmail={user?.email} />
       
       <main className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Choose Your Plan</h1>
-          <p className="text-xl text-gray-600">
-            Upgrade to unlock premium features and get the most out of InsightsLM
+          <h1 className="text-4xl font-bold text-foreground mb-4">Choose Your Plan</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Upgrade to unlock premium features and get the most out of InsightsDWS
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {products.map((product) => (
             <PricingCard
               key={product.id}
@@ -54,19 +57,51 @@ const Pricing = () => {
         </div>
 
         {subscription && (
-          <div className="mt-12 text-center">
-            <div className="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold mb-2">Current Subscription</h3>
-              <p className="text-gray-600 mb-2">
-                Status: <span className="capitalize font-medium">{subscription.subscription_status}</span>
-              </p>
-              {subscription.current_period_end && (
-                <p className="text-gray-600">
-                  {subscription.cancel_at_period_end ? 'Expires' : 'Renews'} on:{' '}
-                  {new Date(subscription.current_period_end * 1000).toLocaleDateString()}
-                </p>
-              )}
-            </div>
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-foreground mb-6 text-center">Your Subscription</h2>
+            <Card className="max-w-2xl mx-auto p-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Current Plan</span>
+                  <span className="font-medium">{currentPlan?.name || 'Free'}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Status</span>
+                  <span className={`capitalize font-medium ${subscription.subscription_status === 'active' ? 'text-green-600' : subscription.subscription_status === 'past_due' ? 'text-amber-600' : ''}`}>
+                    {subscription.subscription_status}
+                  </span>
+                </div>
+                
+                {subscription.current_period_end && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">
+                      {subscription.cancel_at_period_end ? 'Expires on' : 'Next billing date'}
+                    </span>
+                    <span className="font-medium">
+                      {new Date(subscription.current_period_end * 1000).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                
+                {subscription.payment_method_brand && subscription.payment_method_last4 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Payment method</span>
+                    <span className="font-medium capitalize">
+                      {subscription.payment_method_brand} •••• {subscription.payment_method_last4}
+                    </span>
+                  </div>
+                )}
+                
+                <Separator className="my-4" />
+                
+                <div className="flex justify-end">
+                  <Button variant="outline" onClick={() => window.open('https://dashboard.stripe.com/billing/portal', '_blank')}>
+                    Manage Subscription
+                  </Button>
+                </div>
+              </div>
+            </Card>
           </div>
         )}
       </main>
